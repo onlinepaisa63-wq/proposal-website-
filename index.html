@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>For You ❤️</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:Arial,sans-serif;color:#fff;
+  background:radial-gradient(circle at 50% 20%,#ff9ab7 0,#ff4f81 38%,#6f2b7b 100%);
+}
+.screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:22px;transition:opacity .7s,transform .7s;
+}
+.card{
+  width:min(92vw,430px);text-align:center;padding:32px 22px;
+  border:1px solid rgba(255,255,255,.35);border-radius:30px;
+  background:rgba(255,255,255,.14);backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 25px 70px rgba(0,0,0,.28);
+}
+.heart{font-size:70px;animation:beat 1.15s infinite;margin-bottom:10px}
+h1{font-size:30px;margin-bottom:12px}
+.name{font-size:37px;font-weight:800;margin-bottom:18px;text-shadow:0 3px 15px rgba(0,0,0,.15)}
+p{font-size:16px;line-height:1.7}
+.question{font-size:25px;font-weight:800;margin:22px 0 18px}
+.buttons{display:flex;justify-content:center;gap:16px;min-height:62px}
+button{
+  border:0;border-radius:999px;padding:15px 28px;font-size:18px;font-weight:800;
+  font-family:inherit;touch-action:manipulation;
+}
+#yes{background:#fff;color:#e84393;box-shadow:0 8px 25px rgba(0,0,0,.25)}
+#yes:active{transform:scale(.93)}
+#no{background:rgba(255,255,255,.22);color:#fff;position:relative;z-index:5;touch-action:none}
+.hidden{opacity:0;transform:scale(.92);pointer-events:none}
+#videoScreen{display:none;opacity:0}
+#videoScreen.show{display:flex;animation:fadeIn .8s forwards}
+.video-card{width:min(94vw,760px);text-align:center}
+.video-title{font-size:30px;font-weight:800;margin-bottom:15px;text-shadow:0 3px 18px rgba(0,0,0,.2)}
+video{
+  width:100%;max-height:70vh;display:block;background:#000;border-radius:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.small{margin-top:12px;font-size:14px;opacity:.9}
+.float{position:fixed;bottom:-50px;pointer-events:none;animation:up linear forwards;z-index:50}
+@keyframes beat{50%{transform:scale(1.2)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes up{to{transform:translateY(-115vh) rotate(360deg);opacity:0}}
+@media(max-width:480px){
+  .card{padding:28px 19px}.heart{font-size:60px}h1{font-size:27px}
+  .name{font-size:33px}.question{font-size:23px}
+  video{max-height:72vh;border-radius:18px}.video-title{font-size:27px}
+}
+</style>
+</head>
+<body>
+
+<section class="screen" id="proposalScreen">
+  <div class="card">
+    <div class="heart">❤️</div>
+    <h1>Hey, My Love...</h1>
+
+    <!-- CHANGE THIS NAME -->
+    <div class="name">[HER NAME] 💕</div>
+
+    <p>
+      There is something I've been wanting to tell you...
+      <br><br>
+      You make my ordinary days feel special,
+      and somehow you became one of the most beautiful
+      parts of my life.
+      <br><br>
+      So I have one little question for you...
+    </p>
+
+    <div class="question">Will You Be Mine? 💍❤️</div>
+
+    <div class="buttons">
+      <button id="yes">YES ❤️</button>
+      <button id="no" type="button">NO 😜</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="videoScreen">
+  <div class="video-card">
+    <div class="video-title">She Said YES! 🥹❤️</div>
+
+    <!-- The uploaded video is in the same folder as this HTML -->
+    <video id="proposalVideo" controls playsinline preload="auto">
+      <source src="proposal-video.mp4" type="video/mp4">
+      Your browser does not support video.
+    </video>
+
+    <div class="small">A little something I made for you ❤️</div>
+  </div>
+</section>
+
+<script>
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const proposalScreen = document.getElementById("proposalScreen");
+const videoScreen = document.getElementById("videoScreen");
+const video = document.getElementById("proposalVideo");
+
+function moveNo(e){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+
+  const pad = 12;
+  const w = no.offsetWidth;
+  const h = no.offsetHeight;
+
+  // Keep NO fully inside the phone screen.
+  const x = pad + Math.random() * Math.max(1, innerWidth - w - pad*2);
+  const y = pad + Math.random() * Math.max(1, innerHeight - h - pad*2);
+
+  no.style.position = "fixed";
+  no.style.left = x + "px";
+  no.style.top = y + "px";
+}
+
+// Desktop: NO escapes before it can be clicked.
+no.addEventListener("pointerenter", moveNo);
+
+// Phone: NO escapes on touch.
+no.addEventListener("pointerdown", moveNo);
+
+// Extra fallback if a browser produces a click.
+no.addEventListener("click", moveNo);
+
+yes.addEventListener("click", async () => {
+  proposalScreen.classList.add("hidden");
+
+  setTimeout(() => {
+    proposalScreen.style.display = "none";
+    videoScreen.classList.add("show");
+  }, 350);
+
+  createHearts();
+
+  // Because this starts directly from the YES tap,
+  // mobile browsers are more likely to allow playback.
+  try {
+    await video.play();
+  } catch(err) {
+    // If the browser blocks sound/autoplay, the video controls remain available.
+    video.controls = true;
+  }
+});
+
+function createHearts(){
+  const emojis=["❤️","💖","💕","💗","💘","🥰"];
+  for(let i=0;i<45;i++){
+    const h=document.createElement("div");
+    h.className="float";
+    h.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(18+Math.random()*26)+"px";
+    h.style.animationDuration=(3+Math.random()*4)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),7500);
+  }
+}
+</script>
+</body>
+</html>
